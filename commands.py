@@ -3,8 +3,8 @@ from random import choice
 
 
 def say_time():
-    print(f">> Время {datetime.datetime.strftime(datetime.datetime.now(), '%H:%M')}")
-    return datetime.datetime.strftime(datetime.datetime.now(), '%H %M')
+    print(f">> Сейчас {datetime.datetime.strftime(datetime.datetime.now(), '%H:%M')}")
+    return f"Сейчас {datetime.datetime.strftime(datetime.datetime.now(), '%H %M')}"
 
 
 def say_bye():

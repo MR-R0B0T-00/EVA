@@ -8,12 +8,11 @@ import commands
 
 
 eva = pyttsx3.init()
-recognizer = sr.Recognizer()
-microphone = sr.Microphone()
-
-
 eva.setProperty('rate', 200)
 eva.setProperty('volume', 1)
+
+recognizer = sr.Recognizer()
+microphone = sr.Microphone()
 
 
 def speak(what):
@@ -22,7 +21,6 @@ def speak(what):
     eva.stop()
 
 
-# Обработка команд
 def command_handler(text):
     if re.findall('время|времени|часы|часов', text):
         speak(commands.say_time())
@@ -31,8 +29,8 @@ def command_handler(text):
         sys.exit()
     elif re.findall('привет|здарово|хай|здравствуй', text):
         speak(commands.say_hello())
-    else:
-        pass
+    elif text == 'что ты умеешь':
+        speak(commands.listing_commands())
 
 
 def eva_run():
@@ -53,6 +51,6 @@ def eva_run():
 
 print('>> Вас приветствует обучаемый голосовой ассистент ЕВА.')
 speak('Вас приветствует обучаемый голосовой ассистент ЕВА.')
-print('>> Спросите "что ты умеешь?" и получите листинг моих команд')
-speak('Спросите "что ты умеешь?" и получите листинг моих команд')
+print('>> Спросите "что ты умеешь?" и получите листинг моих команд.')
+speak('Спросите "что ты умеешь?" и получите листинг моих команд.')
 eva_run()
