@@ -1,11 +1,10 @@
 # Импорт необходимых библиотек
-from random import choice
 import sys
 import speech_recognition as sr
 import pyttsx3
 import time
 import re
-import datetime
+import commands
 
 
 eva = pyttsx3.init()
@@ -13,9 +12,8 @@ recognizer = sr.Recognizer()
 microphone = sr.Microphone()
 
 
-def set_voice():
-    eva.setProperty('rate', 200)
-    eva.setProperty('volume', 1)
+eva.setProperty('rate', 200)
+eva.setProperty('volume', 1)
 
 
 def speak(what):
@@ -25,26 +23,16 @@ def speak(what):
 
 
 # Обработка команд
-def commands(text):
-    # Системное время
-    if text == 'ева':
-        speak('Слушаю, хозяин!')
-    elif re.findall('время|времени|часы|часов', text):
-        print(f">> Время {datetime.datetime.strftime(datetime.datetime.now(), '%H:%M')}")
-        speak(datetime.datetime.strftime(datetime.datetime.now(), '%H %M'))
-    # Завершение программы
+def command_handler(text):
+    if re.findall('время|времени|часы|часов', text):
+        speak(commands.say_time())
     elif re.findall('пока|до свидания|отключись|стоп', text):
-        answer = choice(['Всего доброго!', 'Пока!', 'До связи!'])
-        print(f'>> {answer}')
-        speak(answer)
+        speak(commands.say_bye())
         sys.exit()
     elif re.findall('привет|здарово|хай|здравствуй', text):
-        answer = choice(['Приветствую!', 'Привет!', 'Здравствуйте!'])
-        print(f'>> {answer}')
-        speak(answer)
+        speak(commands.say_hello())
     else:
-        print(text)
-        speak(text)
+        pass
 
 
 def eva_run():
@@ -56,12 +44,15 @@ def eva_run():
             audio = recognizer.listen(source)
             try:
                 text = recognizer.recognize_vosk(audio, language='ru_RU').lower()
-                commands(text)
+                command_handler(text)
             except sr.UnknownValueError:
                 # Если не разобрали
                 speak('Повторите, пожалуйста!')
             time.sleep(0.1)
 
 
-set_voice()
+print('>> Вас приветствует обучаемый голосовой ассистент ЕВА.')
+speak('Вас приветствует обучаемый голосовой ассистент ЕВА.')
+print('>> Спросите "что ты умеешь?" и получите листинг моих команд')
+speak('Спросите "что ты умеешь?" и получите листинг моих команд')
 eva_run()
