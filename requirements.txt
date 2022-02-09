@@ -80,3 +80,5 @@ tzlocal==2.1
 urllib3==1.26.5
 vosk==0.3.32
 yarl==1.6.3
+
+pyowm~=3.2.0

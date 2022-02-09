@@ -29,6 +29,8 @@ def command_handler(text):
         sys.exit()
     elif re.findall('привет|здарово|хай|здравствуй', text):
         speak(commands.say_hello())
+    elif re.findall('погод', text):
+        speak(commands.say_weather('Podolsk'))
     elif text == 'что ты умеешь':
         speak(commands.listing_commands())
 
