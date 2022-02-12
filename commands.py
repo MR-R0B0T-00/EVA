@@ -3,10 +3,12 @@ from random import choice
 import pyowm.config as config_weather
 from pyowm import OWM
 from cfg import API_KEY, LANGUAGE
+import wikipediaapi
 
 config_weather.DEFAULT_CONFIG['language'] = LANGUAGE
 owm = OWM(API_KEY)
 mgr = owm.weather_manager()
+wikipedia = wikipediaapi.Wikipedia(LANGUAGE)
 
 
 def say_weather(city):
@@ -40,6 +42,7 @@ def say_hello():
     return hello
 
 
-def listing_commands():
-    print('>> Пока я умею, здороваться, прощаться и подсказывать время, в будущем команд будет больше.')
-    return 'Пока я умею, здороваться, прощаться и подсказывать время, в будущем команд будет больше.'
+def what_it(wiki):
+    answer = wikipedia.page(wiki)
+    print(f'>> {answer.summary}')
+    return answer.summary

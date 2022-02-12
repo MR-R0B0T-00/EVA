@@ -31,8 +31,8 @@ def command_handler(text):
         speak(commands.say_hello())
     elif re.findall('погод', text):
         speak(commands.say_weather('Podolsk'))
-    elif text == 'что ты умеешь':
-        speak(commands.listing_commands())
+    elif text.startswith('что такое'):
+        speak(commands.what_it(text[10:]))
 
 
 def eva_run():
@@ -53,6 +53,5 @@ def eva_run():
 
 print('>> Вас приветствует обучаемый голосовой ассистент ЕВА.')
 speak('Вас приветствует обучаемый голосовой ассистент ЕВА.')
-print('>> Спросите "что ты умеешь?" и получите листинг моих команд.')
-speak('Спросите "что ты умеешь?" и получите листинг моих команд.')
+
 eva_run()
