@@ -1,24 +1,30 @@
 import datetime
 from random import choice
-import pyowm.config as config_weather
-from pyowm import OWM
+import pyowm
+from pyowm.config import DEFAULT_CONFIG
 from cfg import API_KEY, LANGUAGE
 import wikipediaapi
+from translate import Translator
 
-config_weather.DEFAULT_CONFIG['language'] = LANGUAGE
-owm = OWM(API_KEY)
+DEFAULT_CONFIG['language'] = LANGUAGE
+owm = pyowm.OWM(API_KEY)
 mgr = owm.weather_manager()
 wikipedia = wikipediaapi.Wikipedia(LANGUAGE)
+translator = Translator('en')
 
 
 def say_weather(city):
-    observation = mgr.weather_at_place(f'{city},RU')
+    try:
+        observation = mgr.weather_at_place(f'{translator.translate(city)},RU')
+    except pyowm.commons.exceptions.NotFoundError:
+        print(f'>> Города {city} нет в моей базе, извините.')
+        return f'Города {city} нет в моей базе, извините.'
     w = observation.weather
-    result = f'В Подольске сейчас: {w.detailed_status}' \
+    result = f'В городе {city} сейчас: {w.detailed_status}' \
              f'Температура воздуха: {round(w.temperature("celsius")["temp"])} по Цельсию' \
              f'Ощущается как: {round(w.temperature("celsius")["feels_like"])} по Цельсию' \
              f'Скорость ветра: {round(w.wind()["speed"])} метра в секунду.'
-    print(f'>> В Подольске сейчас: {w.detailed_status}')
+    print(f'>> В городе {city} сейчас: {w.detailed_status}')
     print(f'>> Температура воздуха: {round(w.temperature("celsius")["temp"])} по Цельсию')
     print(f'>> Ощущается как: {round(w.temperature("celsius")["feels_like"])} по Цельсию')
     print(f'>> Скорость ветра: {round(w.wind()["speed"])} метра в секунду.')
