@@ -28,9 +28,7 @@ def listing_microphone():
 
 
 def command_handler(text):
-    if re.findall('врем|час', text):
-        speak(commands.say_time())
-    elif re.findall('пока', text):
+    if re.findall('пока', text):
         speak(commands.say_bye())
         sys.exit()
     elif re.findall('привет|здравствуй', text):
@@ -46,8 +44,8 @@ def command_handler(text):
             else:
                 print('>> Извините, я Вас не слышу повторите пожалуйста')
                 speak('Извините, я Вас не слышу повторите пожалуйста')
-    elif text.startswith('что такое'):
-        speak(commands.what_it(text[10:]))
+    elif text.startswith('узнать про'):
+        speak(commands.what_it(text[11:]))
 
 
 def eva_run():
