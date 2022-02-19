@@ -1,9 +1,8 @@
-# Импорт необходимых библиотек
 import sys
 import speech_recognition as sr
 import pyttsx3
-import re
 import commands
+import google
 
 eva = pyttsx3.init()
 eva.setProperty('rate', 200)
@@ -19,40 +18,45 @@ def speak(what):
     eva.stop()
 
 
-def listing_microphone():
+def text_from_microphone():
     with microphone as source:
-        print('>> Говорите, я слушаю.')
+        print('>> Я слушаю.')
         recognizer.adjust_for_ambient_noise(source)
         audio = recognizer.listen(source)
-        return audio
+        return recognizer.recognize_vosk(audio, language='ru_RU')
 
 
 def command_handler(text):
-    if re.findall('пока', text):
-        speak(commands.say_bye())
-        sys.exit()
-    elif re.findall('привет|здравствуй', text):
-        speak(commands.say_hello())
-    elif re.findall('погод', text):
-        while True:
-            print('>> В каком городе Вы сейчас находитесь?')
-            speak('В каком городе Вы сейчас находитесь?')
-            city = recognizer.recognize_vosk(listing_microphone(), language='ru_RU').capitalize()
-            if city:
-                speak(commands.say_weather(city))
-                break
-            else:
-                print('>> Извините, я Вас не слышу повторите пожалуйста')
-                speak('Извините, я Вас не слышу повторите пожалуйста')
-    elif text.startswith('узнать про'):
-        speak(commands.what_it(text[11:]))
+    try:
+        answer = commands.dialog_flow_answer(text)
+        if answer[0]:
+            print(f'>> {answer[0]}')
+            speak(answer[0])
+        else:
+            print('>> Я вас не поняла')
+            speak('Я вас не поняла')
+        if answer[1] == 'smalltalk.greetings.bye':
+            sys.exit()
+        elif answer[1] == 'smalltalk.agent.say_weather':
+            while True:
+                city = text_from_microphone().capitalize()
+                if city:
+                    speak(commands.say_weather(city))
+                    break
+                else:
+                    print('>> Извините, повторите, пожалуйста, город.')
+                    speak('Извините, повторите, пожалуйста, город')
+    except google.api_core.exceptions.InvalidArgument:
+        pass
+    except google.api_core.exceptions.RetryError:
+        print('>> Проблемы с интернет-соединением')
+        speak('Проблемы с интернет-соединением')
 
 
 def eva_run():
     while True:
         try:
-            text = recognizer.recognize_vosk(listing_microphone(), language='ru_RU').lower()
-            command_handler(text)
+            command_handler(text_from_microphone().lower())
         except sr.UnknownValueError:
             speak('Повторите, пожалуйста!')
 
