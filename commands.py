@@ -8,30 +8,33 @@ import os
 DEFAULT_CONFIG['language'] = 'ru'
 owm = pyowm.OWM(API_KEY)
 mgr = owm.weather_manager()
+
 translator = Translator('en')
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'small-talk-hlcf-c4d492b1181c.json'
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'google_access.json'
+PROJECT_ID = 'small-talk-hlcf'
+SESSION_ID = 'eva'
 session_client = dialogflow.SessionsClient()
-session = session_client.session_path('small-talk-hlcf', 'eva')
+session = session_client.session_path(PROJECT_ID, SESSION_ID)
 
 
 def say_weather(city):
     try:
         observation = mgr.weather_at_place(f'{translator.translate(city)},RU')
     except pyowm.commons.exceptions.NotFoundError:
-        print(f'>> Города {city} нет в моей базе, извините.')
-        return f'Города {city} нет в моей базе, извините.'
+        print(f'>> Город {city} мне не известен.')
+        return f'Город {city} мне не известен.'
     except pyowm.commons.exceptions.InvalidSSLCertificateError:
         print('>> Возможно у Вас неполадки с интернет-соединением. Проверьте и повторите позднее.')
         return 'Возможно у Вас неполадки с интернет соединением. Проверьте и повторите позднее'
-    w = observation.weather
-    result = f'В городе {city} сейчас: {w.detailed_status}' \
-             f'Температура воздуха: {round(w.temperature("celsius")["temp"])} по Цельсию' \
-             f'Ощущается как: {round(w.temperature("celsius")["feels_like"])} по Цельсию' \
-             f'Скорость ветра: {round(w.wind()["speed"])} метра в секунду.'
-    print(f'>> В городе {city} сейчас: {w.detailed_status}')
-    print(f'>> Температура воздуха: {round(w.temperature("celsius")["temp"])} по Цельсию')
-    print(f'>> Ощущается как: {round(w.temperature("celsius")["feels_like"])} по Цельсию')
-    print(f'>> Скорость ветра: {round(w.wind()["speed"])} метра в секунду.')
+    result = f'В городе {city} сейчас: {observation.weather.detailed_status}' \
+             f'Температура воздуха: {observation.weather.temperature("celsius")["temp"]:0.0f} по Цельсию' \
+             f'Ощущается как: {observation.weather.temperature("celsius")["feels_like"]:0.0f} по Цельсию' \
+             f'Скорость ветра: {observation.weather.wind()["speed"]:0.0f} в метрах в секунду.'
+    print(f'>> В городе {city} сейчас: {observation.weather.detailed_status}')
+    print(f'>> Температура воздуха: {observation.weather.temperature("celsius")["temp"]:0.0f} по Цельсию')
+    print(f'>> Ощущается как: {observation.weather.temperature("celsius")["feels_like"]:0.0f} по Цельсию')
+    print(f'>> Скорость ветра: {observation.weather.wind()["speed"]:0.0f} в метрах в секунду.')
     return result
 
 

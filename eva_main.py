@@ -33,8 +33,8 @@ def command_handler(text):
             print(f'>> {answer[0]}')
             speak(answer[0])
         else:
-            print('>> Я вас не поняла')
-            speak('Я вас не поняла')
+            print('>> Повторите, пожалуйста.')
+            speak('Повторите, пожалуйста')
         if answer[1] == 'smalltalk.greetings.bye':
             sys.exit()
         elif answer[1] == 'smalltalk.agent.say_weather':
@@ -44,24 +44,26 @@ def command_handler(text):
                     speak(commands.say_weather(city))
                     break
                 else:
-                    print('>> Извините, повторите, пожалуйста, город.')
-                    speak('Извините, повторите, пожалуйста, город')
+                    print('>> Повторите, пожалуйста, город.')
+                    speak('Повторите, пожалуйста, город')
     except google.api_core.exceptions.InvalidArgument:
         pass
     except google.api_core.exceptions.RetryError:
-        print('>> Проблемы с интернет-соединением')
+        print('>> Проблемы с интернет-соединением.')
         speak('Проблемы с интернет-соединением')
 
 
 def eva_run():
+    print('>> Обучаемый голосовой ассистент EVA <<')
+    print('*' * 39)
     while True:
         try:
             command_handler(text_from_microphone().lower())
         except sr.UnknownValueError:
+            print('>> Повторите, пожалуйста!')
             speak('Повторите, пожалуйста!')
+        print('*' * 39)
 
 
-print('>> Вас приветствует обучаемый голосовой ассистент ЕВА.')
-speak('Вас приветствует обучаемый голосовой ассистент ЕВА.')
-
-eva_run()
+if __name__ == '__main__':
+    eva_run()
