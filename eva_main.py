@@ -1,32 +1,40 @@
 import sys
-import speech_recognition as sr
-import pyttsx3
+import speech_recognition as sr  # Перевод речи в текст
+import pyttsx3  # Перевод текста в речь
 import commands
-import google
+import google  # Модуль для работы Dialogflow от Google
 
+# Инициализация голоса
 eva = pyttsx3.init()
 eva.setProperty('rate', 200)
 eva.setProperty('volume', 1)
 
+# Инициализация микрофона
 recognizer = sr.Recognizer()
 microphone = sr.Microphone()
 
 
+# Функция текст в голос, в параметр "what" передаем  текст
 def speak(what):
     eva.say(what)
     eva.runAndWait()
     eva.stop()
 
 
+# Функция распознавания голоса в текст
 def text_from_microphone():
+    # Запись с микрофона
     with microphone as source:
         print('>> Я слушаю.')
         recognizer.adjust_for_ambient_noise(source)
         audio = recognizer.listen(source)
+        # Возвращаем текст, преобразуем с помощью Vosk (работает оффлайн)
         return recognizer.recognize_vosk(audio, language='ru_RU')
 
 
+# Прослушивание команд
 def command_handler(text):
+    # Для dialogflow
     try:
         answer = commands.dialog_flow_answer(text)
         if answer[0]:
@@ -39,6 +47,7 @@ def command_handler(text):
             sys.exit()
         elif answer[1] == 'smalltalk.agent.say_weather':
             while True:
+                # Команда для обработки погоды
                 city = text_from_microphone().capitalize()
                 if city:
                     speak(commands.say_weather(city))
@@ -53,6 +62,7 @@ def command_handler(text):
         speak('Проблемы с интернет-соединением')
 
 
+# Основная функция работы
 def eva_run():
     print('>> Обучаемый голосовой ассистент EVA <<')
     print('*' * 39)
