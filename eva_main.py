@@ -1,8 +1,9 @@
 import sys
 import speech_recognition as sr  # Перевод речи в текст
 import pyttsx3  # Перевод текста в речь
-import commands
+import dialogflow_text
 import google  # Модуль для работы Dialogflow от Google
+from say_weather import say_weather
 
 # Инициализация голоса
 eva = pyttsx3.init()
@@ -27,39 +28,43 @@ def text_from_microphone():
     with microphone as source:
         print('>> Я слушаю.')
         recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.listen(source)
+        # Слушаем только 5 сек
+        audio = recognizer.listen(source, phrase_time_limit=5)
         # Возвращаем текст, преобразуем с помощью Vosk (работает оффлайн)
-        return recognizer.recognize_vosk(audio, language='ru_RU')
+        return recognizer.recognize_vosk(audio, language='ru')
 
 
 # Прослушивание команд
 def command_handler(text):
+    if text == 'ева':
+        speak('Я слушаю')
+        text = text_from_microphone()
     # Для dialogflow
-    try:
-        answer = commands.dialog_flow_answer(text)
-        if answer[0]:
-            print(f'>> {answer[0]}')
-            speak(answer[0])
-        else:
-            print('>> Повторите, пожалуйста.')
-            speak('Повторите, пожалуйста')
-        if answer[1] == 'smalltalk.greetings.bye':
-            sys.exit()
-        elif answer[1] == 'smalltalk.agent.say_weather':
-            while True:
-                # Команда для обработки погоды
-                city = text_from_microphone().capitalize()
-                if city:
-                    speak(commands.say_weather(city))
-                    break
-                else:
-                    print('>> Повторите, пожалуйста, город.')
-                    speak('Повторите, пожалуйста, город')
-    except google.api_core.exceptions.InvalidArgument:
-        pass
-    except google.api_core.exceptions.RetryError:
-        print('>> Проблемы с интернет-соединением.')
-        speak('Проблемы с интернет-соединением')
+        try:
+            answer = dialogflow_text.dialog_flow_answer(text)
+            if answer[0]:
+                print(f'>> {answer[0]}')
+                speak(answer[0])
+            else:
+                print('>> Повторите, пожалуйста.')
+                speak('Повторите, пожалуйста')
+            if answer[1] == 'smalltalk.greetings.bye':
+                sys.exit()
+            elif answer[1] == 'smalltalk.agent.say_weather':
+                while True:
+                    # Команда для обработки погоды
+                    city = text_from_microphone().capitalize()
+                    if city:
+                        speak(say_weather(city))
+                        break
+                    else:
+                        print('>> Повторите, пожалуйста, город.')
+                        speak('Повторите, пожалуйста, город')
+        except google.api_core.exceptions.InvalidArgument:
+            pass
+        except google.api_core.exceptions.RetryError:
+            print('>> Проблемы с интернет-соединением.')
+            speak('Проблемы с интернет-соединением')
 
 
 # Основная функция работы
