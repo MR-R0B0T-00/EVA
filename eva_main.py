@@ -1,8 +1,8 @@
 import sys
 import speech_recognition as sr  # Перевод речи в текст
 import pyttsx3  # Перевод текста в речь
-import dialogflow_text
 import google  # Модуль для работы Dialogflow от Google
+from dialogflow_text import dialog_flow_answer
 from say_weather import say_weather
 
 # Инициализация голоса
@@ -22,7 +22,7 @@ def speak(what):
     eva.stop()
 
 
-# Функция распознавания голоса в текст
+# Функция распознавания голоса
 def text_from_microphone():
     # Запись с микрофона
     with microphone as source:
@@ -41,7 +41,7 @@ def command_handler(text):
         text = text_from_microphone()
     # Для dialogflow
         try:
-            answer = dialogflow_text.dialog_flow_answer(text)
+            answer = dialog_flow_answer(text)
             if answer[0]:
                 print(f'>> {answer[0]}')
                 speak(answer[0])

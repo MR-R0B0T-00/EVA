@@ -1,4 +1,3 @@
-# Модуль для работы с погодой
 from google.cloud import dialogflow
 import os
 
@@ -15,7 +14,7 @@ session = session_client.session_path(PROJECT_ID, SESSION_ID)
 
 
 # Принимает запрос для dialogflow
-# Возвращает текст ответа и событие
+# Возвращает текст ответа и намерение
 def dialog_flow_answer(text):
     text_input = dialogflow.TextInput(text=text, language_code='ru-RU')
     query_input = dialogflow.QueryInput(text=text_input)
