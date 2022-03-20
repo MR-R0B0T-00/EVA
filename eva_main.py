@@ -1,4 +1,5 @@
 import sys
+import json
 import speech_recognition as sr  # Перевод речи в текст
 import pyttsx3  # Перевод текста в речь
 import google  # Модуль для работы Dialogflow от Google
@@ -31,7 +32,8 @@ def text_from_microphone():
         # Слушаем только 5 сек
         audio = recognizer.listen(source, phrase_time_limit=5)
         # Возвращаем текст, преобразуем с помощью Vosk (работает оффлайн)
-        return recognizer.recognize_vosk(audio, language='ru')
+        data = json.loads(recognizer.recognize_vosk(audio, language='ru'))
+        return data['text']
 
 
 # Прослушивание команд
